@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MathBattle — Educational Strategy Game</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!--  SCREEN 1 — LOGIN                                       -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="screen-login" class="screen active">
+    <div class="stars"></div>
+    <div class="login-container">
+      <div class="logo-area">
+        <div class="logo-icon">⚔️</div>
+        <h1 class="logo-title">MathBattle</h1>
+        <p class="logo-sub">Conquer with Knowledge</p>
+      </div>
+      <form id="login-form" class="card glass-card" novalidate>
+        <h2 class="card-title">Enter the Arena</h2>
+        <div class="field-group">
+          <label for="username">Username</label>
+          <input id="username" type="text" placeholder="Your warrior name" autocomplete="username" />
+          <span class="field-error" id="err-username"></span>
+        </div>
+        <div class="field-group">
+          <label for="password">Password</label>
+          <div class="password-wrap">
+            <input id="password" type="password" placeholder="Secret code" autocomplete="current-password" />
+            <button type="button" class="toggle-pw" id="toggle-pw" aria-label="Show password">👁</button>
+          </div>
+          <span class="field-error" id="err-password"></span>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full" id="login-btn">
+          <span class="btn-text">Login</span>
+          <span class="btn-loader hidden">⏳</span>
+        </button>
+        <p class="hint-text">Demo: any username + password "1234"</p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!--  SCREEN 2 — GRADE & MODE SELECTION                      -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="screen-setup" class="screen">
+    <div class="stars"></div>
+    <div class="setup-container">
+      <div class="setup-header">
+        <button class="btn btn-ghost btn-sm" id="logout-btn">← Logout</button>
+        <h2 class="setup-title">Choose Your Battle</h2>
+        <div class="player-badge" id="player-badge">⚔️ <span id="badge-name">Warrior</span></div>
+      </div>
+
+      <div class="setup-grid">
+        <!-- Grade Selection -->
+        <div class="card glass-card setup-card">
+          <h3 class="section-label">📚 Select Your Grade</h3>
+          <div class="grade-grid" id="grade-grid">
+            <!-- Grades 1-9 injected by JS -->
+          </div>
+        </div>
+
+        <!-- Mode Selection -->
+        <div class="card glass-card setup-card">
+          <h3 class="section-label">🎮 Game Mode</h3>
+          <div class="mode-grid">
+            <button class="mode-card" data-mode="single" id="mode-single">
+              <div class="mode-icon">🤖</div>
+              <div class="mode-name">Single Player</div>
+              <div class="mode-desc">Battle the AI</div>
+            </button>
+            <button class="mode-card" data-mode="multi" id="mode-multi">
+              <div class="mode-icon">👥</div>
+              <div class="mode-name">Multiplayer</div>
+              <div class="mode-desc">Challenge a friend</div>
+            </button>
+          </div>
+
+          <!-- AI Difficulty (single player only) -->
+          <div id="difficulty-section" class="difficulty-section hidden">
+            <h3 class="section-label" style="margin-top:1.5rem">⚡ AI Difficulty</h3>
+            <div class="diff-grid">
+              <button class="diff-btn" data-diff="easy">🟢 Easy</button>
+              <button class="diff-btn" data-diff="medium">🟡 Medium</button>
+              <button class="diff-btn" data-diff="hard">🔴 Hard</button>
+            </div>
+          </div>
+
+          <!-- Multiplayer room -->
+          <div id="multi-section" class="multi-section hidden">
+            <h3 class="section-label" style="margin-top:1.5rem">🔗 Room Code</h3>
+            <div class="room-row">
+              <input id="room-code-input" type="text" placeholder="Enter room code" maxlength="6" class="room-input" />
+              <button class="btn btn-accent btn-sm" id="join-room-btn">Join</button>
+            </div>
+            <button class="btn btn-secondary btn-sm" id="create-room-btn" style="margin-top:.5rem;width:100%">Create New Room</button>
+            <div id="room-status" class="room-status"></div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-xl" id="start-game-btn" disabled>
+        ⚔️ Start Battle
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!--  SCREEN 3 — GAME ARENA                                  -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="screen-game" class="screen">
+    <!-- Top HUD -->
+    <header class="hud">
+      <div class="hud-player hud-left">
+        <div class="hud-avatar">🧑‍🎓</div>
+        <div class="hud-info">
+          <span class="hud-name" id="hud-player-name">Player</span>
+          <div class="hud-hp-bar">
+            <div class="hud-hp-fill" id="player-hp-fill" style="width:100%"></div>
+          </div>
+          <span class="hud-hp-text" id="player-hp-text">100 HP</span>
+        </div>
+      </div>
+
+      <div class="hud-center">
+        <div class="round-badge">Round <span id="round-num">1</span></div>
+        <div class="timer-ring" id="timer-ring">
+          <svg viewBox="0 0 60 60">
+            <circle cx="30" cy="30" r="26" class="timer-track"/>
+            <circle cx="30" cy="30" r="26" class="timer-progress" id="timer-circle"/>
+          </svg>
+          <span class="timer-text" id="timer-text">30</span>
+        </div>
+        <div class="score-row">
+          <span class="score-badge" id="player-score-badge">0</span>
+          <span class="score-vs">vs</span>
+          <span class="score-badge enemy" id="enemy-score-badge">0</span>
+        </div>
+      </div>
+
+      <div class="hud-player hud-right">
+        <div class="hud-info" style="text-align:right">
+          <span class="hud-name" id="hud-enemy-name">Enemy</span>
+          <div class="hud-hp-bar">
+            <div class="hud-hp-fill enemy" id="enemy-hp-fill" style="width:100%"></div>
+          </div>
+          <span class="hud-hp-text" id="enemy-hp-text">100 HP</span>
+        </div>
+        <div class="hud-avatar">🤖</div>
+      </div>
+    </header>
+
+    <!-- Battlefield -->
+    <div class="battlefield" id="battlefield">
+      <!-- Enemy army (top) -->
+      <div class="army-row enemy-army" id="enemy-army">
+        <div class="army-label">Enemy Forces</div>
+        <div class="soldiers-container" id="enemy-soldiers"></div>
+      </div>
+
+      <!-- Battle divider -->
+      <div class="battle-divider">
+        <div class="divider-line"></div>
+        <div class="divider-icon" id="battle-effect">⚔️</div>
+        <div class="divider-line"></div>
+      </div>
+
+      <!-- Player army (bottom) -->
+      <div class="army-row player-army" id="player-army">
+        <div class="soldiers-container" id="player-soldiers"></div>
+        <div class="army-label">Your Forces</div>
+      </div>
+    </div>
+
+    <!-- Question Panel -->
+    <div class="question-panel" id="question-panel">
+      <div class="question-meta">
+        <span class="q-grade-badge" id="q-grade-badge">Grade 1</span>
+        <span class="q-topic-badge" id="q-topic-badge">Addition</span>
+        <span class="q-streak" id="q-streak">🔥 0 streak</span>
+      </div>
+      <div class="question-text" id="question-text">Loading question...</div>
+      <div class="answer-area" id="answer-area">
+        <!-- Populated by JS: MCQ buttons or text input -->
+      </div>
+      <div class="feedback-bar" id="feedback-bar"></div>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="action-bar">
+      <div class="action-info">
+        <span class="soldier-count-label">🪖 Soldiers: <strong id="soldier-count">0</strong></span>
+      </div>
+      <div class="action-buttons">
+        <button class="btn btn-attack" id="btn-attack" disabled>
+          ⚔️ Attack
+          <span class="action-cost">(-3 soldiers)</span>
+        </button>
+        <button class="btn btn-defend" id="btn-defend" disabled>
+          🛡️ Defend
+          <span class="action-cost">(-2 soldiers)</span>
+        </button>
+        <button class="btn btn-special" id="btn-special" disabled>
+          💥 Special
+          <span class="action-cost">(-5 soldiers)</span>
+        </button>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="quit-game-btn">✕ Quit</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!--  SCREEN 4 — GAME OVER                                   -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="screen-gameover" class="screen">
+    <div class="stars"></div>
+    <div class="gameover-container">
+      <div class="gameover-icon" id="gameover-icon">🏆</div>
+      <h1 class="gameover-title" id="gameover-title">Victory!</h1>
+      <p class="gameover-sub" id="gameover-sub">You conquered the battlefield!</p>
+      <div class="stats-grid" id="stats-grid">
+        <!-- Injected by JS -->
+      </div>
+      <div class="gameover-actions">
+        <button class="btn btn-primary btn-xl" id="play-again-btn">⚔️ Play Again</button>
+        <button class="btn btn-ghost" id="main-menu-btn">🏠 Main Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!--  GLOBAL OVERLAYS                                        -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div id="toast-container" class="toast-container"></div>
+  <div id="modal-overlay" class="modal-overlay hidden">
+    <div class="modal-box" id="modal-box">
+      <div class="modal-content" id="modal-content"></div>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
